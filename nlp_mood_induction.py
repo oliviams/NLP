@@ -9,6 +9,8 @@ import requests
 import nltk
 import re
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
 import pandas as pd
 
 nltk.download('vader_lexicon')
@@ -21,16 +23,17 @@ def getdata(url):
     r = requests.get(url)
     return r.text
 
-def text_preprocessing(text):  # What other preprocessing is needed? remove punctuation, \n...?
-    text = text.lower() # Are all these necessary?
+def text_preprocessing(text):
+    text = text.lower()
     text = re.sub("@\\w+", "", text)
     text = re.sub("https?://.+", "", text)
-    text = re.sub("\\d+\\w*\\d*", "", text)  # removes numbers, maybe other things?
+    text = re.sub("\\d+\\w*\\d*", "", text)
     text = re.sub("#\\w+", "", text)
     return(text)
 
 df = pd.read_csv('Web-Browsing_Mood_Induction_January+12,+2022_06.47.csv', skipinitialspace=True, usecols=['Q3'])
 
+score_averages = []
 for i in range(len(df)-2) :
   url_string = df.loc[i+2, 'Q3']
   url_list = url_string.split()
@@ -41,16 +44,24 @@ for i in range(len(df)-2) :
       soup = BeautifulSoup(html, 'html.parser')
       paragraph = []
       for data in soup.find_all("p"):
-          paragraph.append(data.get_text())
-      paragraph = ' '.join(paragraph) # when in a list this had lots of \n which don't get printed, are these going into the sentiment analysis? Do they affect the score?
-      paragraph = text_preprocessing(paragraph)
+          sentence = data.get_text()
+          sentence = text_preprocessing(sentence)
+          text_tokens = word_tokenize(sentence)
+          tokens_without_sw = [word for word in text_tokens if not word in stopwords.words('english')]
+          filtered_sentence = (" ").join(tokens_without_sw)
+          paragraph.append(filtered_sentence)
+      # print(paragraph)
+      paragraph = ' '.join(paragraph)
 
-      # scores = [sid.polarity_scores(paragraph)['compound']]
-      sentiment = sid.polarity_scores(paragraph)['pos'] - sid.polarity_scores(paragraph)['neg']
-      sentiment_list.append(sentiment)
-  scores_df = pd.DataFrame({'URLs': url_list, 'Scores': sentiment_list})
+      scores = sid.polarity_scores(paragraph)['compound']
+      # sentiment = sid.polarity_scores(paragraph)['pos'] - sid.polarity_scores(paragraph)['neg']
+      sentiment_list.append(scores)
+  scores_df = pd.DataFrame({'URL': url_list, 'Score': sentiment_list})
   print(scores_df)
+  score_averages.append(scores_df[['Score']].mean(axis=1))
 
+summary_df = pd.DataFrame({'Participant': [i+1 for i in len(score_averages)], 'Score Average': score_averages})
+summary_df.to_excel('mood_induction_nltk.xlsx')
 
 
 
