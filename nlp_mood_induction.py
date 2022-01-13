@@ -6,6 +6,7 @@ from nltk.sentiment.vader import SentimentIntensityAnalyzer
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 import pandas as pd
+import openpyxl
 
 nltk.download('vader_lexicon')
 sia = SentimentIntensityAnalyzer()
@@ -28,7 +29,7 @@ def text_preprocessing(text):
 df = pd.read_csv('Web-Browsing_Mood_Induction_January+12,+2022_06.47.csv', skipinitialspace=True, usecols=['Q3'])
 
 score_averages = []
-for i in range(len(df)-2) :
+for i in range(len(df)-2):
   url_string = df.loc[i+2, 'Q3']
   url_list = url_string.split()
   print(url_list)
@@ -52,9 +53,10 @@ for i in range(len(df)-2) :
       sentiment_list.append(scores)
   scores_df = pd.DataFrame({'URL': url_list, 'Score': sentiment_list})
   print(scores_df)
-  score_averages.append(scores_df[['Score']].mean(axis=1))
+  score_averages.append(scores_df['Score'].mean())
+  print(score_averages)
 
-summary_df = pd.DataFrame({'Participant': [i+1 for i in len(score_averages)], 'Score Average': score_averages})
+summary_df = pd.DataFrame({'Participant': [i+1 for i in range(len(score_averages))], 'Score Average': score_averages})
 summary_df.to_excel('mood_induction_nltk.xlsx')
 
 
