@@ -1,9 +1,3 @@
-# import pip
-# pip.main(['install', 'requests'])
-# pip.main(['install', 'bs4'])
-# pip.main(['install', 'nltk'])
-# pip.main(['install', 're'])
-# pip.main(['install', 'pandas'])
 from bs4 import BeautifulSoup
 import requests
 import nltk
@@ -14,7 +8,7 @@ from nltk.tokenize import word_tokenize
 import pandas as pd
 
 nltk.download('vader_lexicon')
-sid = SentimentIntensityAnalyzer()
+sia = SentimentIntensityAnalyzer()
 
 def getdata(url):
     """
@@ -53,8 +47,8 @@ for i in range(len(df)-2) :
       # print(paragraph)
       paragraph = ' '.join(paragraph)
 
-      scores = sid.polarity_scores(paragraph)['compound']
-      # sentiment = sid.polarity_scores(paragraph)['pos'] - sid.polarity_scores(paragraph)['neg']
+      scores = sia.polarity_scores(paragraph)['compound']
+      # sentiment = sia.polarity_scores(paragraph)['pos'] - sia.polarity_scores(paragraph)['neg']
       sentiment_list.append(scores)
   scores_df = pd.DataFrame({'URL': url_list, 'Score': sentiment_list})
   print(scores_df)
