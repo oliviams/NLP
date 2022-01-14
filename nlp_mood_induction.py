@@ -1,14 +1,3 @@
-# import pip
-# pip.main(['install', 'requests'])
-# pip.main(['install', 'bs4'])
-# pip.main(['install', 'nltk'])
-# pip.main(['install', 're'])
-# pip.main(['install', 'pandas'])
-# pip.main(['install', 'openpyxl'])
-# pip.main(['install', 'errno'])
-# pip.main(['install', 'os'])
-# pip.main(['install', 'signal'])
-# pip.main(['install', 'time'])
 from bs4 import BeautifulSoup
 import requests
 import nltk
@@ -77,7 +66,7 @@ for i in range(len(df)-2):
             sentiment_list.append(np.nan)
     scores_df = pd.DataFrame({'URL': url_list, 'Score': sentiment_list})
     score_averages.append(scores_df['Score'].mean())
-    print(score_averages)
+    print(scores_df)
 
 summary_df = pd.DataFrame({'Participant': [i+1 for i in range(len(score_averages))], 'Score Average': score_averages})
 summary_df.to_excel('mood_induction_nltk.xlsx')
