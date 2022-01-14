@@ -1,3 +1,14 @@
+# import pip
+# pip.main(['install', 'requests'])
+# pip.main(['install', 'bs4'])
+# pip.main(['install', 'nltk'])
+# pip.main(['install', 're'])
+# pip.main(['install', 'pandas'])
+# pip.main(['install', 'openpyxl'])
+# pip.main(['install', 'errno'])
+# pip.main(['install', 'os'])
+# pip.main(['install', 'signal'])
+# pip.main(['install', 'time'])
 from bs4 import BeautifulSoup
 import requests
 import nltk
@@ -38,7 +49,6 @@ def handler(signum, frame):
 df = pd.read_csv('Web-Browsing_Mood_Induction_January+12,+2022_06.47.csv', skipinitialspace=True, usecols=['Q3'])
 
 signal.signal(signal.SIGALRM, handler)
-signal.alarm(5)
 
 score_averages = []
 for i in range(len(df)-2):
@@ -46,6 +56,7 @@ for i in range(len(df)-2):
     url_list = url_string.split()
     sentiment_list = []
     for url in url_list:
+        signal.alarm(5)
         try:
             html = getdata(url)
             soup = BeautifulSoup(html, 'html.parser')
