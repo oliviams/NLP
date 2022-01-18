@@ -1,14 +1,3 @@
-# import pip
-# pip.main(['install', 'requests'])
-# pip.main(['install', 'bs4'])
-# pip.main(['install', 'nltk'])
-# pip.main(['install', 're'])
-# pip.main(['install', 'pandas'])
-# pip.main(['install', 'openpyxl'])
-# pip.main(['install', 'errno'])
-# pip.main(['install', 'os'])
-# pip.main(['install', 'signal'])
-# pip.main(['install', 'time'])
 from bs4 import BeautifulSoup
 import requests
 import nltk
@@ -46,14 +35,22 @@ def handler(signum, frame):
     """
     raise Exception("end of time")
 
-df = pd.read_csv('Web-Browsing_Mood_Induction_January+12,+2022_06.47.csv', skipinitialspace=True, usecols=['Q3'])
+df = pd.read_csv('Web-Browsing_Mood__Induction_Main_Master.csv', skipinitialspace=True, usecols=['Q3'])
 
 signal.signal(signal.SIGALRM, handler)
 
+participants = []
+prolific_id = []
+url_full_list = []
+
 score_averages = []
-for i in range(len(df)-2):
-    url_string = df.loc[i+2, 'Q3']
+# for i in range(len(df)-1):
+for i in range(5):
+    url_string = df.loc[i+1, 'Q3']
     url_list = url_string.split()
+    url_full_list.append(url_list)
+    participants.append(i+1)
+    prolific_id.append(df.loc[i+1, 'Q158'])
     sentiment_list = []
     for url in url_list:
         signal.alarm(5)
@@ -78,6 +75,12 @@ for i in range(len(df)-2):
     scores_df = pd.DataFrame({'URL': url_list, 'Score': sentiment_list})
     score_averages.append(scores_df['Score'].mean())
     print(scores_df)
+
+url_df = pd.DataFrame(url_full_list, columns = ['URL' + str(i+1) for i in range(max([len(list) for list in url_full_list]))])
+df.insert(0, 'Prolific ID', prolific_id)
+df.insert(0, 'Participant', participants)
+print(url_df)
+url_df.to_excel('mood_induction_urls.xlsx')
 
 summary_df = pd.DataFrame({'Participant': [i+1 for i in range(len(score_averages))], 'Score Average': score_averages})
 summary_df.to_excel('mood_induction_nltk.xlsx')
