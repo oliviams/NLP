@@ -1,3 +1,15 @@
+# import pip
+# pip.main(['install', 'requests'])
+# pip.main(['install', 'bs4'])
+# pip.main(['install', 'nltk'])
+# pip.main(['install', 're'])
+# pip.main(['install', 'pandas'])
+# pip.main(['install', 'openpyxl'])
+# pip.main(['install', 'errno'])
+# pip.main(['install', 'os'])
+# pip.main(['install', 'signal'])
+# pip.main(['install', 'time'])
+# pip.main(['install', 'os'])
 from bs4 import BeautifulSoup
 import requests
 import nltk
@@ -10,6 +22,7 @@ import numpy as np
 import openpyxl
 import time
 import signal
+import os
 
 nltk.download('vader_lexicon')
 sia = SentimentIntensityAnalyzer()
@@ -36,6 +49,7 @@ def handler(signum, frame):
     raise Exception("end of time")
 
 df = pd.read_csv('Web-Browsing_Mood__Induction_Main_Master.csv', skipinitialspace=True, usecols=['Q3'])
+df_prolific = pd.read_csv('Web-Browsing_Mood__Induction_Main_Master.csv', skipinitialspace=True, usecols=['Q158'])
 
 signal.signal(signal.SIGALRM, handler)
 
@@ -44,13 +58,13 @@ prolific_id = []
 url_full_list = []
 
 score_averages = []
-# for i in range(len(df)-1):
-for i in range(5):
+for i in range(len(df)-1):
+    os.mkdir('/Users/olivia/Desktop/Rotation 1 - ABL/Chris/Mood induction/' + str(i+1))
     url_string = df.loc[i+1, 'Q3']
     url_list = url_string.split()
     url_full_list.append(url_list)
     participants.append(i+1)
-    prolific_id.append(df.loc[i+1, 'Q158'])
+    prolific_id.append(df_prolific.loc[i+1, 'Q158'])
     sentiment_list = []
     for url in url_list:
         signal.alarm(5)
@@ -58,15 +72,18 @@ for i in range(5):
             html = getdata(url)
             soup = BeautifulSoup(html, 'html.parser')
             paragraph = []
+            text_file = open('/Users/olivia/Desktop/Rotation 1 - ABL/Chris/Mood induction/' + str(i + 1) + '/' + str(i + 1) + "URL" + str(url_list.index(url) + 1) + '.txt', 'w')
             for data in soup.find_all("p"):
-                sentence = data.get_text()
+                sentence = data.get_text() 
+                text_file.write(sentence)
                 sentence = text_preprocessing(sentence)
                 text_tokens = word_tokenize(sentence)
                 tokens_without_sw = [word for word in text_tokens if not word in stopwords.words('english')]
                 filtered_sentence = (" ").join(tokens_without_sw)
                 paragraph.append(filtered_sentence)
-            # print(paragraph)
+            text_file.close()
             paragraph = ' '.join(paragraph)
+            print(paragraph)
             score = sia.polarity_scores(paragraph)['compound']
             # sentiment = sia.polarity_scores(paragraph)['pos'] - sia.polarity_scores(paragraph)['neg']
             sentiment_list.append(score)
