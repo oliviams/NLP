@@ -1,15 +1,3 @@
-# import pip
-# pip.main(['install', 'requests'])
-# pip.main(['install', 'bs4'])
-# pip.main(['install', 'nltk'])
-# pip.main(['install', 're'])
-# pip.main(['install', 'pandas'])
-# pip.main(['install', 'openpyxl'])
-# pip.main(['install', 'errno'])
-# pip.main(['install', 'os'])
-# pip.main(['install', 'signal'])
-# pip.main(['install', 'time'])
-# pip.main(['install', 'os'])
 from bs4 import BeautifulSoup
 import requests
 import nltk
