@@ -47,7 +47,7 @@ url_full_list = []
 
 score_averages = []
 for i in range(len(df)-1):
-    os.mkdir('/Users/olivia/Desktop/Rotation 1 - ABL/Chris/Mood induction/' + str(i+1))
+    # os.mkdir('/Users/olivia/Desktop/Rotation 1 - ABL/Chris/Mood induction/' + str(i+1))
     url_string = df.loc[i+1, 'Q3']
     url_list = url_string.split()
     url_full_list.append(url_list)
@@ -62,8 +62,8 @@ for i in range(len(df)-1):
             paragraph = []
             text_file = open('/Users/olivia/Desktop/Rotation 1 - ABL/Chris/Mood induction/' + str(i + 1) + '/' + str(i + 1) + "URL" + str(url_list.index(url) + 1) + '.txt', 'w')
             for data in soup.find_all("p"):
-                sentence = data.get_text() 
-                text_file.write(sentence)
+                sentence = data.get_text()
+                # text_file.write(sentence)
                 sentence = text_preprocessing(sentence)
                 text_tokens = word_tokenize(sentence)
                 tokens_without_sw = [word for word in text_tokens if not word in stopwords.words('english')]
@@ -71,22 +71,21 @@ for i in range(len(df)-1):
                 paragraph.append(filtered_sentence)
             text_file.close()
             paragraph = ' '.join(paragraph)
-            print(paragraph)
             score = sia.polarity_scores(paragraph)['compound']
-            # sentiment = sia.polarity_scores(paragraph)['pos'] - sia.polarity_scores(paragraph)['neg']
+            sentiment = sia.polarity_scores(paragraph)['pos'] - sia.polarity_scores(paragraph)['neg']
             sentiment_list.append(score)
         except Exception as exc:
             sentiment_list.append(np.nan)
     scores_df = pd.DataFrame({'URL': url_list, 'Score': sentiment_list})
     score_averages.append(scores_df['Score'].mean())
     print(scores_df)
+    scores_df.to_excel('/Users/olivia/Desktop/Rotation 1 - ABL/Chris/Mood induction/Session Values/mood_induction_participant_' + str(i+1) + '.xlsx', index=False)
 
 url_df = pd.DataFrame(url_full_list, columns = ['URL' + str(i+1) for i in range(max([len(list) for list in url_full_list]))])
-df.insert(0, 'Prolific ID', prolific_id)
-df.insert(0, 'Participant', participants)
-print(url_df)
-url_df.to_excel('mood_induction_urls.xlsx')
+url_df.insert(0, 'Prolific ID', prolific_id)
+url_df.insert(0, 'Participant', participants)
+url_df.to_excel('mood_induction_urls.xlsx', index=False)
 
 summary_df = pd.DataFrame({'Participant': [i+1 for i in range(len(score_averages))], 'Score Average': score_averages})
-summary_df.to_excel('mood_induction_nltk.xlsx')
+summary_df.to_excel('mood_induction_nltk.xlsx', index=False)
 
