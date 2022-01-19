@@ -47,7 +47,7 @@ url_full_list = []
 
 score_averages = []
 for i in range(len(df)-1):
-    # os.mkdir('/Users/olivia/Desktop/Rotation 1 - ABL/Chris/Mood induction/' + str(i+1))
+    os.mkdir('/Users/olivia/Desktop/Rotation 1 - ABL/Chris/Mood induction/' + str(i+1))
     url_string = df.loc[i+1, 'Q3']
     url_list = url_string.split()
     url_full_list.append(url_list)
@@ -63,7 +63,7 @@ for i in range(len(df)-1):
             text_file = open('/Users/olivia/Desktop/Rotation 1 - ABL/Chris/Mood induction/' + str(i + 1) + '/' + str(i + 1) + "URL" + str(url_list.index(url) + 1) + '.txt', 'w')
             for data in soup.find_all("p"):
                 sentence = data.get_text()
-                # text_file.write(sentence)
+                text_file.write(sentence)
                 sentence = text_preprocessing(sentence)
                 text_tokens = word_tokenize(sentence)
                 tokens_without_sw = [word for word in text_tokens if not word in stopwords.words('english')]
